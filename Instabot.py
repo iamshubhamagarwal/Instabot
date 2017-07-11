@@ -9,23 +9,23 @@ BASE_URL = 'https://api.instagram.com/v1/'
 
 #Method to print own info
 def self_info():
+ try:
     request_url=BASE_URL+'users/self/?access_token='+APP_ACCESS_TOKEN
     print "GET request url: %s" %(request_url)                               #Prints get requests url
     user_info=requests.get(request_url).json()                    #Stores json objects
-    if user_info['meta']['code'] == 200:                                            #Checks if meta code is 200
-        try:
-            if len(user_info['data']):              #Check the user info is valid or not
+ except:
+   print "Request url is not working proper. Please Try again."
+   if user_info['meta']['code'] == 200:                                            #Checks if meta code is 200
+         if len(user_info['data']):              #Check the user info is valid or not
                 print ('Username: %s') % (user_info['data']['username'])
                 print ('No. of followers: %s',) % (user_info['data']['counts']['followed_by'])
                 print ('No. of people you are following: %s') % (user_info['data']['counts']['follows'])
                 print ('No. of posts: %s')% (user_info['data']['counts']['media'])
                 print ('Short Bio: %s') %(user_info['data']['bio'])
-            else:
+         else:
                 print 'User does not exist!'
-        except KeyError:
-            print "Unable to process your request. Please try again!!"
-    else:
-        print 'Status code other than 200 received!'               #It means eveything is ok
+ else:
+         print 'Status code other than 200 received!'               #It means eveything is ok
 
 
 #Function declaration to get the ID of a user by username
