@@ -68,7 +68,7 @@ def get_user_info(insta_username):
             except KeyError:
                 print "Unable to process your request. Please try again!!"
         else:
-            print 'Status code other than 200 received!'
+            print 'Status code other than 200 received!'        #Check Status of code is 200
 
 
 #Function to get own recent post and downld the images
@@ -85,7 +85,7 @@ def get_own_post():
                 print 'Your image has been downloaded!'
             else:
                 print 'Post does not exist!'
-        except KeyError:
+        except KeyError:                                                     #Give the error if put wrong details
             print "Unable to process your request. Please try again!!"
     else:
         print 'Status code other than 200 received!'
@@ -105,7 +105,7 @@ def get_user_post(insta_username):
         if len(user_media['data']):
             image_name = user_media['data'][0]['id'] + '.jpeg'
             image_url = user_media['data'][0]['images']['standard_resolution']['url']
-            urllib.urlretrieve(image_url, image_name)
+            urllib.urlretrieve(image_url, image_name)                         #It take the image from the user url and download it
             print 'Your image has been downloaded!'
         else:
             print 'Post does not exist!'
@@ -127,7 +127,7 @@ def get_post_id(insta_username):
             if len(user_media['data']):
                 return user_media['data'][0]['id']
             else:
-                print 'There is no recent post of the user!'
+                print 'There is no recent post of the user!'                 #Check the recent post of the user
                 exit()
         except KeyError:
             print "Unable to process your request. Please try again!!"
@@ -145,7 +145,7 @@ def get_like_list(insta_username):
     try:
         request_url=(BASE_URL+'media/%s/likes?access_token=%s') %(post_id,APP_ACCESS_TOKEN)
         print 'GET request url : %s' % (request_url)
-        like_list = requests.get(request_url).json()
+        like_list = requests.get(request_url).json()                    #Check the like list of the recent post
         if len(like_list['data']):
             print 'These are the usernames that have liked your recent post:'
             for i in range(len(like_list['data'])):
@@ -165,7 +165,7 @@ def like_a_post(insta_username):
     print 'POST request url : %s' % (request_url)
     try:
         post_a_like = requests.post(request_url, payload).json()
-        if post_a_like['meta']['code'] == 200:
+        if post_a_like['meta']['code'] == 200:                          #it help to like a post through the user
             print 'Like was successful!'
         else:
             print 'Your like was unsuccessful. Try again!'
@@ -408,4 +408,4 @@ def start_bot():
             else:
                 print "wrong choice"
 
-start_bot()
+start_bot()           
