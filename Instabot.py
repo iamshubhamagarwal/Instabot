@@ -286,25 +286,25 @@ def choose_image():
                 if user_id == None:
                     print "Username not valid!"
                 else:
-                    request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s') % (user_id, APP_ACCESS_TOKEN)
+                    request_url = (BASE_URL + 'users/%s/locations/search?lat=48.858844&lng=2.294351&access_token=%s') % (user_id, APP_ACCESS_TOKEN)
                     print 'GET request url : %s' % (request_url)
-                    user_media = requests.get(request_url).json()
-                if user_media['meta']['code'] == 200:
-                    if len(user_media['data']):
+                    geography_recent_media = requests.get(request_url).json()
+                if geography_recent_media['meta']['code'] == 200:
+                    if len(geography_recent_media['data']):
                         like_image_list = []
-                    for i in range(len(user_media['data'])):
-                        lat = user_media['data'][i]['count']['geometry']['location']['lat']
-                        lng = user_media['data'][i]['count']['geometry']['location']['lng']
+                    for i in range(len(geography_recent_media['data'])):
+                        lat = geography_recent_media['data'][i]['count']['geometry']['location']['lat']
+                        lng = geography_recent_media['data'][i]['count']['geometry']['location']['lng']
                         like_image_list.append(lat)
                         like_image_list.append(lng)
                         lng_count = min(like_image_list)
                         lat_count = min(like_image_list)
-                    for i in range(len(user_media['data'])):
-                        if user_media['data'][i]['likes']['count'] == lng_count:
-                            if user_media['data'][i]['likes']['count'] == lat_count:
-                                get_id = user_media['data'][i]['id']
+                    for i in range(len(geography_recent_media['data'])):
+                        if geography_recent_media['data'][i]['likes']['count'] == lng_count:
+                            if geography_recent_media['data'][i]['likes']['count'] == lat_count:
+                                get_id = geography_recent_media['data'][i]['id']
                                 image_name = get_id + '.jpg'
-                                image_url = user_media['data'][i]['images']['standard_resolution']['url']
+                                image_url = geography_recent_media['data'][i]['images']['standard_resolution']['url']
                         urllib.urlretrieve(image_url, image_name)
                         print 'Your image has been downloaded!'
 
@@ -408,4 +408,4 @@ def start_bot():
             else:
                 print "wrong choice"
 
-start_bot()           
+start_bot()
