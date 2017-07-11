@@ -275,7 +275,82 @@ def delete_negative_comment(insta_username):
     except KeyError:
             print "Unable to process your request. Please try again!!"
 
+def choose_image():
+        print "a.Choose images between certain geographical coordinate "
+        print "b.Choose image which has particular text in caption"
+        choice = raw_input("Enter your choice: ")
+        try:
+            if choice == 'a':
+                user_name = raw_input("Enter username: ")
+                user_id = get_user_id(user_name)
+                if user_id == None:
+                    print "Username not valid!"
+                else:
+                    request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s') % (user_id, APP_ACCESS_TOKEN)
+                    print 'GET request url : %s' % (request_url)
+                    user_media = requests.get(request_url).json()
+                if user_media['meta']['code'] == 200:
+                    if len(user_media['data']):
+                        like_image_list = []
+                    for i in range(len(user_media['data'])):
+                        lat = user_media['data'][i]['count']['geometry']['location']['lat']
+                        lng = user_media['data'][i]['count']['geometry']['location']['lng']
+                        like_image_list.append(lat)
+                        like_image_list.append(lng)
+                        lng_count = min(like_image_list)
+                        lat_count = min(like_image_list)
+                    for i in range(len(user_media['data'])):
+                        if user_media['data'][i]['likes']['count'] == lng_count:
+                            if user_media['data'][i]['likes']['count'] == lat_count:
+                                get_id = user_media['data'][i]['id']
+                                image_name = get_id + '.jpg'
+                                image_url = user_media['data'][i]['images']['standard_resolution']['url']
+                        urllib.urlretrieve(image_url, image_name)
+                        print 'Your image has been downloaded!'
 
+                elif choice == 'b':  # choose b to see natuaral clamity
+                    user_name = raw_input("Enter username: ")
+                    user_id = get_user_id(user_name)
+                    if user_id == None:
+                        print "Username not valid!"
+                    else:
+                        request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s') % (
+                        user_id, APP_ACCESS_TOKEN)
+                        print 'GET request url : %s' % (request_url)
+                user_media = requests.get(request_url).json()
+            if user_media['meta']['code'] == 200:  # CHECKS IF RECIEVED META CODE IS 200
+                if len(user_media['data']):
+                    word = raw_input(
+                        "Enter word you want to search in caption of a post(It's case-sensitive!): ")  # ASKING FOR TEXT USER WANT TO SEARCH FOR IN CAPTION
+                    if word.isspace() == True or len(word) == 0:
+                        print "Word cannot be empty. Try again!"
+                    else:
+                        count = 0
+                        for i in range(len(user_media['data'])):  # LOOP ITERATES THROUGH ITEMS IN JSON ARRAY- DATA
+                            caption = user_media['data'][i]['caption']['text']
+                            if word in caption:  # GETS THE POST IF WORD IS FOUND IN CAPTION OF POST
+                                print "Post id is: %s" % (user_media['data'][i]['id'])
+                                print "Caption: %s\n" % (caption)
+                                get_id = user_media['data'][i]['id']
+                                image_name = get_id + '.jpeg'
+                                image_url = user_media['data'][i]['images']['standard_resolution']['url']
+                                urllib.urlretrieve(image_url, image_name)
+                                print 'Your image has been downloaded!'
+                                count += 1  # INCREMENTS COUNT BY 1
+
+                                # WE CAN FETCH ANY POST DETAIL BUT HERE I AM DOWNLOADING THE POST AND PRINTTING ITS CAPTION AND ID
+
+                        if count == 0:  # SO IF COUNT WAS NEVER INCREMENTED MEANS WORD IS NOT IN ANY CAPTION
+                            print "Entered word is not in caption of any post!"
+                        else:
+                            print "This user has no media. Try again!"
+                else:
+                    print "Status code other than 200 recieved"
+
+            else:
+                print "Wrong choice!! Try again."
+        except:
+            print "Unable to process your request. Please try again!!"
 
 
 #function to ask users user for task they want to perform
