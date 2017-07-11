@@ -314,41 +314,38 @@ def choose_image():
                     if user_id == None:
                         print "Username not valid!"
                     else:
-                        request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s') % (
+                        request_url = (BASE_URL + 'users/%s/locations/search?lat=48.858844&lng=2.294351&access_token=%s') % (
                         user_id, APP_ACCESS_TOKEN)
                         print 'GET request url : %s' % (request_url)
                 user_media = requests.get(request_url).json()
-            if user_media['meta']['code'] == 200:  # CHECKS IF RECIEVED META CODE IS 200
+            if user_media['meta']['code'] == 200:
                 if len(user_media['data']):
                     word = raw_input(
-                        "Enter word you want to search in caption of a post(It's case-sensitive!): ")  # ASKING FOR TEXT USER WANT TO SEARCH FOR IN CAPTION
+                        "Enter word you want to search in caption of a post(It's case-sensitive!): ")  
                     if word.isspace() == True or len(word) == 0:
                         print "Word cannot be empty. Try again!"
                     else:
                         count = 0
-                        for i in range(len(user_media['data'])):  # LOOP ITERATES THROUGH ITEMS IN JSON ARRAY- DATA
+                        for i in range(len(user_media['data'])):
                             caption = user_media['data'][i]['caption']['text']
-                            if word in caption:  # GETS THE POST IF WORD IS FOUND IN CAPTION OF POST
+                            if word in caption:                  # Found the word if caption is there
                                 print "Post id is: %s" % (user_media['data'][i]['id'])
                                 print "Caption: %s\n" % (caption)
                                 get_id = user_media['data'][i]['id']
-                                image_name = get_id + '.jpeg'
+                                image_name = get_id + '.jpg'
                                 image_url = user_media['data'][i]['images']['standard_resolution']['url']
                                 urllib.urlretrieve(image_url, image_name)
                                 print 'Your image has been downloaded!'
-                                count += 1  # INCREMENTS COUNT BY 1
-
-                                # WE CAN FETCH ANY POST DETAIL BUT HERE I AM DOWNLOADING THE POST AND PRINTTING ITS CAPTION AND ID
-
-                        if count == 0:  # SO IF COUNT WAS NEVER INCREMENTED MEANS WORD IS NOT IN ANY CAPTION
+                                count += 1
+                        if count == 0:
                             print "Entered word is not in caption of any post!"
                         else:
-                            print "This user has no media. Try again!"
+                            print "This user has no media. Try next time!"
                 else:
                     print "Status code other than 200 recieved"
 
             else:
-                print "Wrong choice!! Try again."
+                print "Wrong choice!! Try next time."
         except:
             print "Unable to process your request. Please try again!!"
 
