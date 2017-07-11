@@ -179,7 +179,7 @@ def unlike_a_post(insta_username):
     print 'DELETE request url: %s'%(request_url)
     unlike_post=requests.delete(request_url).json()
     if unlike_post['meta']['code'] == 200:
-        print 'Unike was successful!'
+        print 'Unlike was successful!'
     else:
         print 'Your Unlike was unsuccessful. Try again!'
 
@@ -291,14 +291,14 @@ def choose_image():
                     geography_recent_media = requests.get(request_url).json()
                 if geography_recent_media['meta']['code'] == 200:
                     if len(geography_recent_media['data']):
-                        like_image_list = []
+                        geography_image_list = []
                     for i in range(len(geography_recent_media['data'])):
                         lat = geography_recent_media['data'][i]['count']['geometry']['location']['lat']
                         lng = geography_recent_media['data'][i]['count']['geometry']['location']['lng']
-                        like_image_list.append(lat)
-                        like_image_list.append(lng)
-                        lng_count = min(like_image_list)
-                        lat_count = min(like_image_list)
+                        geography_image_list.append(lat)
+                        geography_image_list.append(lng)
+                        lng_count = min(geography_image_list)
+                        lat_count = min(geography_image_list)
                     for i in range(len(geography_recent_media['data'])):
                         if geography_recent_media['data'][i]['likes']['count'] == lng_count:
                             if geography_recent_media['data'][i]['likes']['count'] == lat_count:
@@ -308,20 +308,18 @@ def choose_image():
                         urllib.urlretrieve(image_url, image_name)
                         print 'Your image has been downloaded!'
 
-                elif choice == 'b':  # choose b to see natuaral clamity
+                elif choice == 'b':  # choose b to see caption
                     user_name = raw_input("Enter username: ")
                     user_id = get_user_id(user_name)
                     if user_id == None:
                         print "Username not valid!"
                     else:
-                        request_url = (BASE_URL + 'users/%s/locations/search?lat=48.858844&lng=2.294351&access_token=%s') % (
-                        user_id, APP_ACCESS_TOKEN)
+                        request_url = (BASE_URL + 'users/%s/locations/search?lat=48.858844&lng=2.294351&access_token=%s') % (user_id, APP_ACCESS_TOKEN)
                         print 'GET request url : %s' % (request_url)
                 user_media = requests.get(request_url).json()
             if user_media['meta']['code'] == 200:
                 if len(user_media['data']):
-                    word = raw_input(
-                        "Enter word you want to search in caption of a post(It's case-sensitive!): ")  
+                    word = raw_input("Enter word you want to search in caption of a post: ")
                     if word.isspace() == True or len(word) == 0:
                         print "Word cannot be empty. Try again!"
                     else:
