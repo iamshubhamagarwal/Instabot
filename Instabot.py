@@ -310,16 +310,16 @@ def choose_image():
 
                 elif choice == 'b':  # choose b to see caption
                     user_name = raw_input("Enter username: ")
-                    user_id = get_user_id(user_name)
+                    user_id = get_user_id(user_name)            #Fetching user function
                     if user_id == None:
                         print "Username not valid!"
                     else:
                         request_url = (BASE_URL + 'users/%s/locations/search?lat=48.858844&lng=2.294351&access_token=%s') % (user_id, APP_ACCESS_TOKEN)
-                        print 'GET request url : %s' % (request_url)
-                user_media = requests.get(request_url).json()
+                        print 'GET request url : %s' % (request_url)        #Print get url
+                user_media = requests.get(request_url).json()                 #Requesting the get from the url
             if user_media['meta']['code'] == 200:
                 if len(user_media['data']):
-                    word = raw_input("Enter word you want to search in caption of a post: ")
+                    word = raw_input("Enter word you want to search in caption of a post: ")       #get the word you want to search
                     if word.isspace() == True or len(word) == 0:
                         print "Word cannot be empty. Try again!"
                     else:
@@ -328,11 +328,11 @@ def choose_image():
                             caption = user_media['data'][i]['caption']['text']
                             if word in caption:                  # Found the word if caption is there
                                 print "Post id is: %s" % (user_media['data'][i]['id'])
-                                print "Caption: %s\n" % (caption)
-                                get_id = user_media['data'][i]['id']
+                                print "The Caption: %s\n" % (caption)
+                                get_id = user_media['data'][i]['id']           #Fetching id
                                 image_name = get_id + '.jpg'
                                 image_url = user_media['data'][i]['images']['standard_resolution']['url']
-                                urllib.urlretrieve(image_url, image_name)
+                                urllib.urlretrieve(image_url, image_name)            #Downloading image
                                 print 'Your image has been downloaded!'
                                 count += 1
                         if count == 0:
@@ -366,7 +366,7 @@ def start_bot():
             print "j.Delete negative comments from the recent post of a user\n"
             print "k.To choose images between certain geographical coordinate or post which has particular text in caption\n "
             print "l.Exit"
-
+            #Getting menu choice for user
             choice = raw_input("Enter you choice: ")
             if choice == "a":
                 self_info()
@@ -403,4 +403,4 @@ def start_bot():
             else:
                 print "wrong choice"
 
-start_bot()
+start_bot()              #Recall the startbot
