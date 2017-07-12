@@ -286,27 +286,31 @@ def choose_image():
                 if user_id == None:
                     print "Username not valid!"
                 else:
-                    request_url = (BASE_URL + 'users/%s/locations/search?lat=48.858844&lng=2.294351&access_token=%s') % (user_id, APP_ACCESS_TOKEN)
+                    request_url = (
+                                  BASE_URL + 'users/%s/locations/search?lat=48.858844&lng=2.294351&access_token=%s') % (
+                                  user_id, APP_ACCESS_TOKEN)
                     print 'GET request url : %s' % (request_url)
                     geography_recent_media = requests.get(request_url).json()
                 if geography_recent_media['meta']['code'] == 200:
                     if len(geography_recent_media['data']):
                         geography_image_list = []
-                    for i in range(len(geography_recent_media['data'])):
+                    for i in range(
+                            len(geography_recent_media['data'])):  # Lat for find the latitude and lng for longitude
                         lat = geography_recent_media['data'][i]['count']['geometry']['location']['lat']
                         lng = geography_recent_media['data'][i]['count']['geometry']['location']['lng']
                         geography_image_list.append(lat)
                         geography_image_list.append(lng)
-                        lng_count = min(geography_image_list)
-                        lat_count = min(geography_image_list)
+                        lng_count = lng(geography_image_list)
+                        lat_count = lat(geography_image_list)
                     for i in range(len(geography_recent_media['data'])):
-                        if geography_recent_media['data'][i]['likes']['count'] == lng_count:
-                            if geography_recent_media['data'][i]['likes']['count'] == lat_count:
+                        if geography_recent_media['data'][i]['location']['id'] == lng_count:
+                            if geography_recent_media['data'][i]['location']['id'] == lat_count:
                                 get_id = geography_recent_media['data'][i]['id']
                                 image_name = get_id + '.jpg'
                                 image_url = geography_recent_media['data'][i]['images']['standard_resolution']['url']
                         urllib.urlretrieve(image_url, image_name)
                         print 'Your image has been downloaded!'
+
 
                 elif choice == 'b':  # choose b to see caption
                     user_name = raw_input("Enter username: ")
@@ -314,7 +318,7 @@ def choose_image():
                     if user_id == None:
                         print "Username not valid!"
                     else:
-                        request_url = (BASE_URL + 'users/%s/locations/search?lat=48.858844&lng=2.294351&access_token=%s') % (user_id, APP_ACCESS_TOKEN)
+                        request_url = (BASE_URL + 'users/self/media/recent/?access_token=%s') % (user_id, APP_ACCESS_TOKEN)
                         print 'GET request url : %s' % (request_url)        #Print get url
                 user_media = requests.get(request_url).json()                 #Requesting the get from the url
             if user_media['meta']['code'] == 200:
