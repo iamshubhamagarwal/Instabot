@@ -275,12 +275,13 @@ def delete_negative_comment(insta_username):
     except KeyError:
             print "Unable to process your request. Please try again!!"
 
+
+#Function for min. like and max. like and choose a caption
 def choose_post():
     print "Choose post one of following options:"
     print "a.Choose post with minimum likes"
     print "b.Choose post with maximum likes"
     print "c.Choose post which has text in caption"
-    print "d.Choose post of recent images liked ny user"
     choice = raw_input("Enter your choice: ")
     try:
         if choice == 'a':
@@ -294,19 +295,19 @@ def choose_post():
                 user_media = requests.get(request_url).json()
                 if user_media['meta']['code'] == 200:
                     if len(user_media['data']):
-                        like_count_list = []
+                        like_count_list = []                              #Tell the list of empty
                         for i in range(len(user_media['data'])):
-                            likes = user_media['data'][i]['likes']['count']
-                            like_count_list.append(likes)
+                            likes = user_media['data'][i]['likes']['count']             #How many likes count
+                            like_count_list.append(likes)                               #Open the likes count
                         min_count = min(like_count_list)
                         for i in range(len(user_media['data'])):
-                            if user_media['data'][i]['likes']['count'] == min_count:
+                            if user_media['data'][i]['likes']['count'] == min_count:   #It find the min no. of likes
                                 get_id = user_media['data'][i]['id']
                                 image_name = get_id + '.jpeg'
                                 image_url = user_media['data'][i]['images']['standard_resolution']['url']
                         urllib.urlretrieve(image_url, image_name)
                         print 'Your image has been download!'
-        elif choice == 'b':
+        elif choice == 'b':       #It find the max. no of likes
             user_name = raw_input("Enter username: ")
             user_id = get_user_id(user_name)
             if user_id == None:
@@ -333,7 +334,7 @@ def choose_post():
                         print 'Your image has been download!'
 
 
-        elif choice == 'c':
+        elif choice == 'c':                 #choose a caption
             user_name = raw_input("Enter username: ")
             user_id = get_user_id(user_name)
             if user_id == None:
@@ -349,7 +350,6 @@ def choose_post():
                         if word.isspace() == True or len(word) == 0:
                             print "Word cannot be empty!"
                         else:
-                            count = 0
                             for i in range(len(user_media['data'])):
                                 caption = user_media['data'][i]['caption']['text']
                                 if word in caption:
@@ -360,9 +360,6 @@ def choose_post():
                                     image_url = user_media['data'][i]['images']['standard_resolution']['url']
                                     urllib.urlretrieve(image_url, image_name)
                                     print 'Your image has been download!'
-                                    count += 1
-                            if count == 0:
-                                print "Entered word is not in caption!"
                     else:
                         print "This user has no media. Try again!"
                 else:
@@ -395,6 +392,9 @@ def recent_media_liked():
                print "Unable to process your request. Please try again!!"
 
 
+
+
+#Function for locate the location
 def location_info():
     user_name = raw_input("Enter username: ")
     user_id = get_user_id(user_name)
@@ -403,17 +403,17 @@ def location_info():
     else:
         request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s') % (user_id, APP_ACCESS_TOKEN)
         print 'GET request url : %s' % (request_url)
-        user_media = requests.get(request_url).json()  # STORES JSON OBJECT RESPONSE IN A VARIABLE
+        user_media = requests.get(request_url).json()
 
-        if user_media['meta']['code'] == 200:  # CHECKS IF RECIEVED META CODE IS 200
+        if user_media['meta']['code'] == 200: 
             if len(user_media['data']):
-                word = raw_input("Enter the location you want to search): ")  # ASKING FOR TEXT USER WANT TO SEARCH FOR IN CAPTION
+                word = raw_input("Enter the location you want to search): ")
                 if word.isspace() == True or len(word) == 0:
                     print "id cannot be empty!"
                 else:
                     for i in range(len(user_media['data'])):
                         location = user_media['data'][i]['location']['id']
-                        if word in location:  # GETS THE POST IF WORD IS FOUND IN CAPTION OF POST
+                        if word in location:
                             print "Post id is: %s" % (user_media['data'][i]['id'])
                             print "image: %s\n" % (location)
                             get_id = user_media['data'][i]['id']
