@@ -275,81 +275,157 @@ def delete_negative_comment(insta_username):
     except KeyError:
             print "Unable to process your request. Please try again!!"
 
-def choose_image():
-        print "a.Choose images between certain geographical coordinate "
-        print "b.Choose image which has particular text in caption"
-        choice = raw_input("Enter your choice: ")
-        try:
-            if choice == 'a':
-                user_name = raw_input("Enter username: ")
-                user_id = get_user_id(user_name)
-                if user_id == None:
-                    print "Username not valid!"
-                else:
-                    request_url = (
-                                  BASE_URL + 'users/%s/locations/search?lat=48.858844&lng=2.294351&access_token=%s') % (
-                                  user_id, APP_ACCESS_TOKEN)
-                    print 'GET request url : %s' % (request_url)
-                    geography_recent_media = requests.get(request_url).json()
-                if geography_recent_media['meta']['code'] == 200:
-                    if len(geography_recent_media['data']):
-                        geography_image_list = []
-                    for i in range(
-                            len(geography_recent_media['data'])):  # Lat for find the latitude and lng for longitude
-                        lat = geography_recent_media['data'][i]['count']['geometry']['location']['lat']
-                        lng = geography_recent_media['data'][i]['count']['geometry']['location']['lng']
-                        geography_image_list.append(lat)
-                        geography_image_list.append(lng)
-                        lng_count = lng(geography_image_list)
-                        lat_count = lat(geography_image_list)
-                    for i in range(len(geography_recent_media['data'])):
-                        if geography_recent_media['data'][i]['location']['id'] == lng_count:
-                            if geography_recent_media['data'][i]['location']['id'] == lat_count:
-                                get_id = geography_recent_media['data'][i]['id']
-                                image_name = get_id + '.jpg'
-                                image_url = geography_recent_media['data'][i]['images']['standard_resolution']['url']
-                        urllib.urlretrieve(image_url, image_name)
-                        print 'Your image has been downloaded!'
-
-
-                elif choice == 'b':  # choose b to see caption
-                    user_name = raw_input("Enter username: ")
-                    user_id = get_user_id(user_name)            #Fetching user function
-                    if user_id == None:
-                        print "Username not valid!"
-                    else:
-                        request_url = (BASE_URL + 'users/self/media/recent/?access_token=%s') % (user_id, APP_ACCESS_TOKEN)
-                        print 'GET request url : %s' % (request_url)        #Print get url
-                user_media = requests.get(request_url).json()                 #Requesting the get from the url
-            if user_media['meta']['code'] == 200:
-                if len(user_media['data']):
-                    word = raw_input("Enter word you want to search in caption of a post: ")       #get the word you want to search
-                    if word.isspace() == True or len(word) == 0:
-                        print "Word cannot be empty. Try again!"
-                    else:
-                        count = 0
+def choose_post():
+    print "Choose post one of following options:"
+    print "a.Choose post with minimum likes"
+    print "b.Choose post with maximum likes"
+    print "c.Choose post which has text in caption"
+    print "d.Choose post of recent images liked ny user"
+    choice = raw_input("Enter your choice: ")
+    try:
+        if choice == 'a':
+            user_name = raw_input("Enter username: ")
+            user_id = get_user_id(user_name)
+            if user_id == None:
+                print "Username not valid!"
+            else:
+                request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s') % (user_id, APP_ACCESS_TOKEN)
+                print 'GET request url : %s' % (request_url)
+                user_media = requests.get(request_url).json()
+                if user_media['meta']['code'] == 200:
+                    if len(user_media['data']):
+                        like_count_list = []
                         for i in range(len(user_media['data'])):
-                            caption = user_media['data'][i]['caption']['text']
-                            if word in caption:                  # Found the word if caption is there
-                                print "Post id is: %s" % (user_media['data'][i]['id'])
-                                print "The Caption: %s\n" % (caption)
-                                get_id = user_media['data'][i]['id']           #Fetching id
-                                image_name = get_id + '.jpg'
+                            likes = user_media['data'][i]['likes']['count']
+                            like_count_list.append(likes)
+                        min_count = min(like_count_list)
+                        for i in range(len(user_media['data'])):
+                            if user_media['data'][i]['likes']['count'] == min_count:
+                                get_id = user_media['data'][i]['id']
+                                image_name = get_id + '.jpeg'
                                 image_url = user_media['data'][i]['images']['standard_resolution']['url']
-                                urllib.urlretrieve(image_url, image_name)            #Downloading image
-                                print 'Your image has been downloaded!'
-                                count += 1
-                        if count == 0:
-                            print "Entered word is not in caption of any post!"
+                        urllib.urlretrieve(image_url, image_name)
+                        print 'Your image has been download!'
+        elif choice == 'b':
+            user_name = raw_input("Enter username: ")
+            user_id = get_user_id(user_name)
+            if user_id == None:
+                print "Username not valid!"
+            else:
+                request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s') % (user_id, APP_ACCESS_TOKEN)
+                print 'GET request url : %s' % (request_url)
+                user_media = requests.get(request_url).json()
+
+                if user_media['meta']['code'] == 200:
+                    if len(user_media['data']):
+                        like_count_list = []
+                        for i in range(len(user_media['data'])):
+                            likes = user_media['data'][i]['likes']['count']
+                            like_count_list.append(likes)
+                        min_count = max(like_count_list)
+                        for i in range(len(user_media['data'])):
+
+                            if user_media['data'][i]['likes']['count'] == min_count:
+                                get_id = user_media['data'][i]['id']
+                                image_name = get_id + '.jpeg'
+                                image_url = user_media['data'][i]['images']['standard_resolution']['url']
+                        urllib.urlretrieve(image_url, image_name)
+                        print 'Your image has been download!'
+
+
+        elif choice == 'c':
+            user_name = raw_input("Enter username: ")
+            user_id = get_user_id(user_name)
+            if user_id == None:
+                print "Username not valid!"
+            else:
+                request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s') % (user_id, APP_ACCESS_TOKEN)
+                print 'GET request url : %s' % (request_url)
+                user_media = requests.get(request_url).json()
+
+                if user_media['meta']['code'] == 200:
+                    if len(user_media['data']):
+                        word = raw_input("Enter word you want to search in caption of a post: ")
+                        if word.isspace() == True or len(word) == 0:
+                            print "Word cannot be empty!"
                         else:
-                            print "This user has no media. Try next time!"
+                            count = 0
+                            for i in range(len(user_media['data'])):
+                                caption = user_media['data'][i]['caption']['text']
+                                if word in caption:
+                                    print "Post id is: %s" % (user_media['data'][i]['id'])
+                                    print "Caption: %s\n" % (caption)
+                                    get_id = user_media['data'][i]['id']
+                                    image_name = get_id + '.jpg'
+                                    image_url = user_media['data'][i]['images']['standard_resolution']['url']
+                                    urllib.urlretrieve(image_url, image_name)
+                                    print 'Your image has been download!'
+                                    count += 1
+                            if count == 0:
+                                print "Entered word is not in caption!"
+                    else:
+                        print "This user has no media. Try again!"
                 else:
                     print "Status code other than 200 recieved"
 
+        else:
+            print "Wrong choice!! Try again."
+    except:
+       print "Unable to process your request. Please try again!!"
+
+
+
+#Function for recent like
+def recent_media_liked():
+           request_url = (BASE_URL + 'users/self/media/liked?access_token=%s') % (APP_ACCESS_TOKEN)
+           print 'GET request url: %s' % (request_url)
+           recent_liked_media = requests.get(request_url).json()
+           try:
+               if recent_liked_media['meta']['code'] == 200:
+                   if len(recent_liked_media['data']):
+                       image_name = 'recent_liked' + '.jpg'
+                       image_url = recent_liked_media['data'][0]['images']['standard_resolution']['url']
+                       urllib.urlretrieve(image_url, image_name)
+                       print 'Your image has been downloaded!'
+                   else:
+                       print 'Post does not exist!'
+               else:
+                   print 'Status code other than 200 received!'
+           except KeyError:
+               print "Unable to process your request. Please try again!!"
+
+
+def location_info():
+    user_name = raw_input("Enter username: ")
+    user_id = get_user_id(user_name)
+    if user_id == None:
+        print "Username not valid!"
+    else:
+        request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s') % (user_id, APP_ACCESS_TOKEN)
+        print 'GET request url : %s' % (request_url)
+        user_media = requests.get(request_url).json()  # STORES JSON OBJECT RESPONSE IN A VARIABLE
+
+        if user_media['meta']['code'] == 200:  # CHECKS IF RECIEVED META CODE IS 200
+            if len(user_media['data']):
+                word = raw_input("Enter the location you want to search): ")  # ASKING FOR TEXT USER WANT TO SEARCH FOR IN CAPTION
+                if word.isspace() == True or len(word) == 0:
+                    print "id cannot be empty!"
+                else:
+                    for i in range(len(user_media['data'])):
+                        location = user_media['data'][i]['location']['id']
+                        if word in location:  # GETS THE POST IF WORD IS FOUND IN CAPTION OF POST
+                            print "Post id is: %s" % (user_media['data'][i]['id'])
+                            print "image: %s\n" % (location)
+                            get_id = user_media['data'][i]['id']
+                            image_name = get_id + '.jpeg'
+                            image_url = user_media['data'][i]['images']['standard_resolution']['url']
+                            urllib.urlretrieve(image_url, image_name)
+                            print 'Your image has been downloaded!'
             else:
-                print "Wrong choice!! Try next time."
-        except:
-            print "Unable to process your request. Please try again!!"
+                print "This user has no media. Try again!"
+        else:
+            print "Status code other than 200 recieved"
+
 
 
 #function to ask users user for task they want to perform
@@ -368,7 +444,7 @@ def start_bot():
             print "h.Get a list of comments on the recent post of a user\n"
             print "i.Make a comment on the recent post of a user\n"
             print "j.Delete negative comments from the recent post of a user\n"
-            print "k.To choose images between certain geographical coordinate or post which has particular text in caption\n "
+            print "k.To choose Min and Max likes and choose a caption\n "
             print "l.Exit"
             #Getting menu choice for user
             choice = raw_input("Enter you choice: ")
@@ -401,8 +477,12 @@ def start_bot():
                 insta_username = raw_input("Enter the username of the user: ")
                 delete_negative_comment(insta_username)
             elif choice=='k':
-                choose_image()
+                choose_post()
             elif choice=='l':
+                recent_media_liked()
+            elif choice=='m':
+                location_info()
+            elif choice=='n':
                 exit()
             else:
                 print "wrong choice"
