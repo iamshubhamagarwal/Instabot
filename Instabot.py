@@ -446,7 +446,9 @@ def start_bot():
             print "i.Make a comment on the recent post of a user\n"
             print "j.Delete negative comments from the recent post of a user\n"
             print "k.To choose Min and Max likes and choose a caption\n "
-            print "l.Exit"
+            print "l.To get the recent likes\n"
+            print "m.To get the info of location\n"
+            print "n.Exit\n"
 
 
             #Getting menu choice for user
