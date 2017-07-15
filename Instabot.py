@@ -307,6 +307,8 @@ def choose_post():
                                 image_url = user_media['data'][i]['images']['standard_resolution']['url']
                         urllib.urlretrieve(image_url, image_name)
                         print 'Your image has been download!'
+
+
         elif choice == 'b':       #It find the max. no of likes
             user_name = raw_input("Enter username: ")
             user_id = get_user_id(user_name)
@@ -404,22 +406,21 @@ def location_info():
         request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s') % (user_id, APP_ACCESS_TOKEN)
         print 'GET request url : %s' % (request_url)
         user_media = requests.get(request_url).json()
-
-        if user_media['meta']['code'] == 200: 
+        if user_media['meta']['code'] == 200:
             if len(user_media['data']):
-                word = raw_input("Enter the location you want to search): ")
-                if word.isspace() == True or len(word) == 0:
+                data = raw_input("Enter the location you want to search: ")
+                if data.isspace() == True or len(data) == 0:
                     print "id cannot be empty!"
                 else:
                     for i in range(len(user_media['data'])):
                         location = user_media['data'][i]['location']['id']
-                        if word in location:
+                        if data in location:
                             print "Post id is: %s" % (user_media['data'][i]['id'])
                             print "image: %s\n" % (location)
                             get_id = user_media['data'][i]['id']
-                            image_name = get_id + '.jpeg'
+                            image_name = get_id + '.jpg'
                             image_url = user_media['data'][i]['images']['standard_resolution']['url']
-                            urllib.urlretrieve(image_url, image_name)
+                            urllib.urlretrieve(image_url, image_name)                  #Download the image
                             print 'Your image has been downloaded!'
             else:
                 print "This user has no media. Try again!"
@@ -446,6 +447,8 @@ def start_bot():
             print "j.Delete negative comments from the recent post of a user\n"
             print "k.To choose Min and Max likes and choose a caption\n "
             print "l.Exit"
+
+
             #Getting menu choice for user
             choice = raw_input("Enter you choice: ")
             if choice == "a":
