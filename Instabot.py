@@ -484,7 +484,7 @@ def start_bot():
             elif choice=='l':
                 recent_media_liked()
             elif choice=='m':
-                location_info()
+                location_info()             #Tell the location
             elif choice=='n':
                 exit()
             else:
