@@ -398,34 +398,79 @@ def recent_media_liked():
 
 #Function for locate the location
 def location_info():
-    user_name = raw_input("Enter username: ")
-    user_id = get_user_id(user_name)
-    if user_id == None:
-        print "Username not valid!"
-    else:
-        request_url = (BASE_URL + 'users/%s/media/recent/?access_token=%s') % (user_id, APP_ACCESS_TOKEN)
-        print 'GET request url : %s' % (request_url)
-        user_media = requests.get(request_url).json()
-        if user_media['meta']['code'] == 200:
-            if len(user_media['data']):
-                data = raw_input("Enter the location you want to search: ")
-                if data.isspace() == True or len(data) == 0:
-                    print "id cannot be empty!"
+    try:
+        location = raw_input("Enter the location for which you want to inspect pics??")
+        google_url = "https://maps.googleapis.com/maps/api/geocode/json?address=%s" % location
+        # Get location coordinates
+        location_coordinates = requests.get(google_url).json()
+        location_latitude = location_coordinates['results'][0]['geometry']['location']['lat']
+        location_longitude = location_coordinates['results'][0]['geometry']['location']['lng']
+        # Print coordinates  of location
+        print "coordinates of location: %s" % location
+        print "Location Longitude:%s" % location_longitude
+        print "Location Latitude: %s" % location_latitude
+        url = (BASE_URL + "locations/search/?lat=%s&lng=%s&access_token=%s") % \
+              (location_latitude, location_longitude, APP_ACCESS_TOKEN)
+        # Display get request url
+        print "Get request url for location id :%s" % url
+        location_info = requests.get(url).json()
+        disasters = ['Floods', 'Tsunami', 'Earthquakes', 'Volcanoes', 'Drought', 'Hail', 'Hurricanes', 'Thunderstorms',
+                     'Landslides', 'Tornadoes', 'Wildfire', 'WinterStorm', 'Sinkholes']         # List of natural disasters
+        c = 0
+        if location_info['meta']['code'] == 200:                       # If request has been accepted
+            # If there is some location info
+            if len(location_info['data']):
+                location_id = location_info['data'][0]['id']
+                url2 = (BASE_URL + "locations/%s/media/recent/?access_token=%s") % (location_id, APP_ACCESS_TOKEN)
+                # Display get request url
+                print "Get request url for recent media :%s " % url2
+                location_recent_media = requests.get(url2).json()
+                if location_recent_media['meta']['code'] == 200:
+                    if len(location_recent_media['data']):
+                        for i in range(len(location_recent_media['data'])):
+                            if location_recent_media['data'][i]['caption'] is not None:
+                                # Traversing the disaster list
+                                for j in range(len(disasters)):
+                                    # Checking if any word in list is there in caption
+                                    if disasters[j] in location_recent_media['data'][i]['caption']['text']:
+                                        if location_recent_media['data'][i]['type'] == 'image':
+                                            # If yes than download that image
+                                            print "This image is about %s in %s" % ((disasters[j], ),
+                                                                                   (location))
+                                            image_name = "%s in %s pic.jpeg" % (disasters[j], location)
+                                            image_url = location_recent_media['data'][i]['images']['standard_resolution']['url']
+                                            urllib.urlretrieve(image_url, image_name)
+                                            print "Your image has been downloaded"
+                                            c += 1
+                                        elif location_recent_media['data'][i]['type'] == 'carousel':
+                                            print "Carousel Images"
+                                            for k in range(len(location_recent_media['data'][i]['carousel_media'])):
+                                                # If yes than download that image
+                                                print "This image is about %s in %s" % ((disasters[j]),
+                                                                                        (location))
+                                                image_name = "%s in %s pic.jpeg" % (disasters[j], location)
+                                                image_url = location_recent_media['data'][i]['carousel_media'][k]['images']['standard_resolution']['url']
+                                                urllib.urlretrieve(image_url, image_name)
+                                                print "Your image has been downloaded"
+                                                c += 1
+                                        else:
+                                            print "This type of media in not supported"
+                                if c > 0:
+                                    print "There is natural calamity in this place"
+                                else:
+                                    print "No natural calamity in this place"
+                            else:
+                                print "No caption on this post"
+                    else:
+                        print "No posts for this location"
                 else:
-                    for i in range(len(user_media['data'])):
-                        location = user_media['data'][i]['location']['id']
-                        if data in location:
-                            print "Post id is: %s" % (user_media['data'][i]['id'])
-                            print "image: %s\n" % (location)
-                            get_id = user_media['data'][i]['id']
-                            image_name = get_id + '.jpg'
-                            image_url = user_media['data'][i]['images']['standard_resolution']['url']
-                            urllib.urlretrieve(image_url, image_name)                  #Download the image
-                            print 'Your image has been downloaded!'
+                    print "Status code other than 200"
             else:
-                print "This user has no media. Try again!"
+                print "Location does not exist or some other problem"
         else:
-            print "Status code other than 200 recieved"
+            print "Status code other than 200"
+    except:
+         print "There must be some problem"
 
 
 
